@@ -1,3 +1,12 @@
+#!/usr/bin/env python
+"""
+BG3 modding tool that enables the use of unique placeholder names 
+in places where a UUID or localization handle is expected. Handles 
+generation of IDs (UUIDv4) and storage/reuse of placeholder names.
+
+Usage: uuid_dict_tool.py [-h] [-d DICT] [-p PREFIX] [-o] [-t TARGET] [-v] src
+"""
+
 import uuid
 import json
 import argparse
@@ -105,7 +114,7 @@ handle_location_pattern = re.compile("[\"\']"
 # Define helper functions
 
 def uuid_str_to_handle(uuid_str: str) -> str:
-  # Returns a localization handle string converted from a UUID string
+  """Returns a localization handle string converted from a UUID string"""
   return 'h' + uuid_str.replace('-', 'g')
 
 def new_uuid() -> str:
@@ -115,18 +124,20 @@ def new_handle() -> str:
   return uuid_str_to_handle(new_uuid())
 
 def new_entry(handle: bool) -> str:
-  # Returns a new UUID, or a new localization handle if handle=True
+  """Returns a new UUID, or a new localization handle if handle=True"""
   return new_handle() if handle else new_uuid()
 
 
 def replace_all(pattern: re.Pattern[str], content: str, handle=False) -> str:
-  # Return a string where all placeholders identified by pattern in 
-  # content are replaced with an ID (UUID, or localization handle if 
-  # handle=True). 
-  # IDs are dictated by the placeholder names in uuid_dict. 
-  # If no entry exists for a placeholder, a new ID is generated first 
-  # and added to uuid_dict, before replacing the placeholder in content.
+  """Return a string where all placeholders identified by pattern in 
+  content are replaced with an ID (UUIDv4, or localization handle if 
+  handle=True). 
+  
+  IDs are dictated by the placeholder names in uuid_dict. 
+  If no entry exists for a placeholder, a new ID is generated first 
+  and added to uuid_dict, before replacing the placeholder in content.
   global uuid_dict
+  """
   for mtch in re.finditer(pattern, content):
     name = mtch["placeholder"]
     if handle or not uuid_pattern.fullmatch(name):
