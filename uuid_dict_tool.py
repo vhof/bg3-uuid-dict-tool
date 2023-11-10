@@ -47,23 +47,26 @@ verbose: bool = args["verbose"]
 
 # Handle path arguments
 
+# Set verbosity
+verboseprint = print if verbose else lambda *a, **k: None
+
 # Load dictionary
 uuid_dict: dict
 if uuid_dict_path.exists():
   with uuid_dict_path.open('r') as uuid_dict_file:
-    if verbose: print("loading dictionary...")
+    verboseprint("loading dictionary...")
     uuid_dict = json.load(uuid_dict_file)
 else:
-  if verbose: print("no existing dictionary")
+  verboseprint("no existing dictionary")
   uuid_dict = {}
 
 # Copy directories and files to target directory
 if not overwrite:
-  if verbose: print("copying mod directory...")
+  verboseprint("copying mod directory...")
   shutil.copytree(src_path, dst_path, dirs_exist_ok=True)
 
 # Compile list of files to scan
-if verbose: print("compiling file list...")
+verboseprint("compiling file list...")
 file_paths = []
 for file_type in FILE_TYPES:
   file_paths.extend(list(src_path.rglob(f"*.{file_type}")))
@@ -149,10 +152,10 @@ for path in file_paths:
     dst_sub_path = dst_path / sub_path
   
   dst_sub_path.write_text(content)
-  if verbose: print(str(path.relative_to(src_path)) + ": done")
+  verboseprint(str(path.relative_to(src_path)) + ": done")
 
 ## Save dictionary to file
-if verbose: print("storing dictionary...")
+verboseprint("storing dictionary...")
 with uuid_dict_path.open('w') as uuid_dict_file:
   json.dump(uuid_dict, uuid_dict_file, indent=2, sort_keys=True)
 
